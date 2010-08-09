@@ -1,15 +1,7 @@
 require 'spec_helper'
 
-describe SessionsController do
+ describe SessionsController do
   integrate_views
-
-  
-  	describe "success" do
-  	
-  	  it "should sign the user in" do
-        post :create, :user => @attr
-        controller.should be_signed_in
-      end
 
    describe "with valid email and password" do
 
@@ -33,12 +25,13 @@ describe SessionsController do
       end
     describe "DELETE 'destroy'" do
 
-    it "should sign a user out" do
+     it "should sign a user out" do
       test_sign_in(Factory(:user))
       controller.should be_signed_in
       delete :destroy
       controller.should_not be_signed_in
       response.should redirect_to(root_path)
-    end
-  end
-end
+     end
+    end 
+   end   
+ end    

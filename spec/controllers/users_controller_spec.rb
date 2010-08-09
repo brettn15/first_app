@@ -3,9 +3,7 @@ require 'spec_helper'
 describe UsersController do
   integrate_views
 
-describe "POST 'create'" do
-
-  describe "success" do
+    describe "success" do
 
       before(:each) do
         @attr = { :name => "New User", :email => "user@example.com",
@@ -19,10 +17,10 @@ describe "POST 'create'" do
         post :create, :user => @attr
         response.should redirect_to(user_path(@user))
       end    
-    it "should have a welcome message" do
+      it "should have a welcome message" do
         post :create, :user => @attr
         flash[:success].should =~ /welcome to the sample app/i
       end
-    end
-  end
-end
+    end 
+  
+end  

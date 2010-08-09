@@ -1,40 +1,45 @@
 describe User do
 
-  before(:each) do
-    @attr = {
-      :name => "Example User",
-      :email => "user@example.com",
-      :password => "foobar",
-      :password_confirmation => "foobar"
-    }
-  end
-
-  it "should create a new instance given valid attributes" do
-    User.create!(@attr)
-  end
-  
-  describe "password encryption" do
+ describe "remember me" do
 
     before(:each) do
       @user = User.create!(@attr)
     end
 
-  
-describe "authenticate method" do
+    it "should have a remember token" do
+      @user.should respond_to(:remember_token)
+    end
 
-      it "should return nil on email/password mismatch" do
-        wrong_password_user = User.authenticate(@attr[:email], "wrongpass")
-        wrong_password_user.should be_nil
+    it "should have a remember_me! method" do
+      @user.should respond_to(:remember_me!)
+    end
+
+    it "should set the remember token" do
+      @user.remember_me!
+      @user.remember_token.should_not be_nil
+    end
+ 
+    describe "failure" do
+      it "should not sign a user in" do
+        visit signin_path
+        fill_in :email,    :with => ""
+        fill_in :password, :with => ""
+        click_button
+        response.should render_template('sessions/new')
+        response.should have_tag("div.flash.error", /invalid/i)
       end
+    end
 
-      it "should return nil for an email address with no user" do
-        nonexistent_user = User.authenticate("bar@foo.com", @attr[:password])
-        nonexistent_user.should be_nil
-      end
-
-      it "should return the user on email/password match" do
-        matching_user = User.authenticate(@attr[:email], @attr[:password])
-        matching_user.should == @user
+    describe "success" do
+      it "should sign a user in and out" do
+        user = Factory(:user)
+        visit signin_path
+        fill_in :email,    :with => user.email
+        fill_in :password, :with => user.password
+        click_button
+        controller.should be_signed_in
+        click_link "Sign out"
+        controller.should_not be_signed_in
       end
     end
   end

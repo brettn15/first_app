@@ -2,7 +2,7 @@
   <tr>
     <td class="main">
       <h2>
-        <%= gravatar_image_tag ('@user') %>
+        <%= gravatar_image_tag @user.email %>
         <%= h @user.name %>
       </h2>
     </td>

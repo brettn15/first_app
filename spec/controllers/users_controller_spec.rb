@@ -1,22 +1,37 @@
 require 'spec_helper'
 
-describe UsersController do
-  integrate_views
 
-  describe "GET 'show'" do
+    describe "when not signed in" do
 
-    before(:each) do
-      @user = Factory(:user)
-      # Arrange for User.find(params[:id]) to find the right user.
-      User.stub!(:find, @user.id).and_return(@user)
+      it "should protect 'following'" do
+        get :following
+        response.should redirect_to(signin_path)
+      end
+
+      it "should protect 'followers'" do
+        get :followers
+        response.should redirect_to(signin_path)
+      end
     end
-  
-    it "should show the user's microposts" do
-      mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
-      mp2 = Factory(:micropost, :user => @user, :content => "Baz quux")
-      get :show, :id => @user
-      response.should have_tag("span.content", mp1.content)
-      response.should have_tag("span.content", mp2.content)
+
+    describe "when signed in" do
+
+      before(:each) do
+        @user = test_sign_in(Factory(:user))
+        @other_user = Factory(:user, :email => Factory.next(:email))
+        @user.follow!(@other_user)
+      end
+
+      it "should show user following" do
+        get :following, :id => @user
+        response.should have_tag("a[href=?]", user_path(@other_user),
+                                              @other_user.name)
+      end
+
+      it "should show user followers" do
+        get :followers, :id => @other_user
+        response.should have_tag("a[href=?]", user_path(@user), @user.name)
+      end
     end
   end
- end
+end
